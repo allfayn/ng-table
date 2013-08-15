@@ -1,6 +1,6 @@
 {
-  "name": "ng-table",
-  "version": "0.2.1",
+  "name": "infowrap-ng-table",
+  "version": "0.1.0",
   "main": ["ng-table.js", "ng-table.css"],
   "ignore": [
     "examples", "src"
