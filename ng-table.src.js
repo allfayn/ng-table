@@ -98,7 +98,7 @@ angular.module("ngTable", []).directive("ngTable", [
           return columns.push({
             id: i++,
             title: parsedTitle,
-            sortable: (el.attr("sortable") ? el.attr("sortable") : false),
+            sortable: (el.attr("data-sortable") ? el.attr("data-sortable") : false),
             filter: filter,
             filterTemplateURL: filterTemplateURL,
             headerTemplateURL: headerTemplateURL,
