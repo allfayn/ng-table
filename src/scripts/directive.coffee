@@ -10,54 +10,50 @@ ngTable: Table + Angular JS
 @license New BSD License <http://creativecommons.org/licenses/BSD/>
 ###
 
-angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", "$http", "ngTableParams", ($compile, $q, $parse, $http, ngTableParams) ->
+angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", "$http", "ngTableOptions", ($compile, $q, $parse, $http, ngTableOptions) ->
   restrict: "A"
   priority: 1001
-  scope: true
-  controller: [ "$scope", "$timeout", ($scope, $timeout) ->
-    $scope.params = $scope.params or
-      page: 1
-      count: 10
+  scope:
+    options:"=ngTable"
+    showFilter:"=?"
+  controller: [ "$scope", "$timeout", (s, $timeout) ->
+    # initialize with user provided options or reasonable defaults
+    s.options = s.options or new ngTableOptions({page: 1, count: 10})
 
     # update result every time filter changes
-    $scope.$watch('params.filter', ((value) ->
-      if $scope.params.$liveFiltering
-        updateParams value
-        $scope.goToPage 1
+    s.$watch('options.filter', ((value) ->
+      if s.options.$liveFiltering and s.options.paginationEnabled
+        s.goToPage 1
     ), true)
 
-    updateParams = (newParams) ->
-      newParams = angular.extend($scope.params, newParams)
-
-      # assign params in both scopes
-      $scope.paramsModel.assign $scope.$parent, new ngTableParams(newParams)
-      $scope.params = angular.copy(newParams)
+    updateOptions = (newOptions) ->
+      _.extend(s.options, newOptions)
 
     # goto page
-    $scope.goToPage = (page) ->
-      updateParams page: page  if page > 0 and $scope.params.page isnt page and $scope.params.count * (page - 1) <= $scope.params.total
+    s.goToPage = (page) ->
+      updateOptions page: page  if page > 0 and s.options.page isnt page and s.options.count * (page - 1) <= s.options.total
 
     # change items per page
-    $scope.changeCount = (count) ->
-      updateParams
+    s.changeCount = (count) ->
+      updateOptions
         page: 1
         count: count
 
 
-    $scope.doFilter = ->
-      updateParams page: 1
+    s.doFilter = ->
+      updateOptions page: 1
 
-    $scope.sortBy = (column) ->
+    s.sortBy = (column) ->
       return  unless column.sortable
-      sorting = $scope.params.sorting and $scope.params.sorting[column.sortable] and ($scope.params.sorting[column.sortable] is "desc")
-      sortingParams = {}
-      sortingParams[column.sortable] = (if sorting then "asc" else "desc")
-      updateParams sorting: sortingParams
+      sorting = s.options.sorting and s.options.sorting[column.sortable] and (s.options.sorting[column.sortable] is "desc")
+      sortingOptions = {}
+      sortingOptions[column.sortable] = (if sorting then "asc" else "desc")
+      updateOptions sorting: sortingOptions
   ]
   compile: (element, attrs) ->
     i = 0
     columns = []
-    angular.forEach element.find("tr").eq(0).find("td"), (item) ->
+    _.forEach element.find("tr").eq(0).find("td"), (item) ->
       el = $(item)
       if (el.attr("ignore-cell") && "true" == el.attr("ignore-cell"))
         return
@@ -130,30 +126,24 @@ angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", 
         pages
 
       # update pagination where parameters changes
-      scope.$parent.$watch attrs.ngTable, ((params) ->
-        return  if angular.isUndefined(params)
-        scope.paramsModel = $parse(attrs.ngTable)
-        scope.pages = generatePages(params.page, params.total, params.count)
-        scope.params = angular.copy(params)
-      ), true
+      if scope.options.paginationEnabled
+        scope.$watch 'options', (options) ->
+          return  if _.isUndefined(options)
+          scope.pages = generatePages(options.page, options.total, options.count)
+        , true
 
       scope.parse = (text) ->
         return text(scope)
 
-      # show/hide filter row
-      if attrs.showFilter
-        scope.$parent.$watch attrs.showFilter, (value) ->
-          scope.show_filter = value
-
       # get data from columns
-      angular.forEach columns, (column) ->
+      _.forEach columns, (column) ->
         return  unless column.filterData
         promise = $parse(column.filterData)(scope, $column: column)
-        throw new Error("Function " + column.filterData + " must be promise")  unless (angular.isObject(promise) && angular.isFunction(promise.then))
+        throw new Error("Function " + column.filterData + " must be promise")  unless (_.isObject(promise) && _.isFunction(promise.then))
         delete column["filterData"]
 
         promise.then (data) ->
-          data = []  unless angular.isArray(data)
+          data = []  unless _.isArray(data)
           data.unshift title: "-", id: ""
           column.data = data
 
@@ -164,10 +154,12 @@ angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", 
           pagination: (if attrs.templatePagination then attrs.templatePagination else "ng-table/pager.html")
 
         headerTemplate = $compile("<thead ng-include=\"templates.header\"></thead>")(scope)
-        paginationTemplate = $compile("<div ng-include=\"templates.pagination\"></div>")(scope)
         element.filter("thead").remove()
         tbody = element.find('tbody')
         if (tbody[0]) then $(tbody[0]).before headerTemplate else element.prepend headerTemplate
         element.addClass "ng-table"
-        element.after paginationTemplate
+
+        if scope.options.paginationEnabled
+          paginationTemplate = $compile("<div ng-include=\"templates.pagination\"></div>")(scope)
+          element.after paginationTemplate
 ])

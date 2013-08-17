@@ -6,7 +6,7 @@ module.exports = (grunt) ->
         cmpnt: grunt.file.readJSON('bower.json'),
         banner: '/*! ngTable v<%= cmpnt.version %> by Vitalii Savchuk(esvit666@gmail.com) - ' +
                     'https://github.com/esvit/ng-table - New BSD License */\n',
-            
+
         # Deletes built file and temp directories.
         clean:
             working:
@@ -50,7 +50,9 @@ module.exports = (grunt) ->
         concat:
             # concat js files before minification
             js:
-                src: ['src/scripts/intro.js', '.temp/scripts/directive.js','.temp/scripts/*.js','src/scripts/outro.js']
+                src: ['.temp/scripts/directive.js','.temp/scripts/*.js']
+                # originial meant for require js
+                #src: ['src/scripts/intro.js', '.temp/scripts/directive.js','.temp/scripts/*.js','src/scripts/outro.js']
                 dest: 'ng-table.src.js'
 
         less:

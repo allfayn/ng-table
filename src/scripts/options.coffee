@@ -1,29 +1,29 @@
-angular.module("ngTable").factory "ngTableParams", ->
-  isNumber = (n) ->
-    not isNaN(parseFloat(n)) and isFinite(n)
-  ngTableParams = (data) ->
+angular.module("ngTable").factory("ngTableOptions", ->
+  ngTableOptions = (data) ->
     ignoreFields = ["total","counts", "$liveFiltering"]
     @page = 1
     @count = 1
     @counts = [10,25,50,100]
     @filter = {}
     @sorting = {}
+    @paginationEnabled = true
 
-    # parse url params
-    for key, value of data
-      if key.indexOf("[") >= 0
-        params = key.split(/\[(.*)\]/)
-        lastKey = ""
-        for name in params.reverse()
-          unless name is ""
-            v = value
-            value = {}
-            value[lastKey = name] = (if isNumber(v) then parseFloat(v) else v)
+    _.extend(this, data)
+    # # parse url params
+    # for key, value of data
+    #   if key.indexOf("[") >= 0
+    #     params = key.split(/\[(.*)\]/)
+    #     lastKey = ""
+    #     for name in params.reverse()
+    #       unless name is ""
+    #         v = value
+    #         value = {}
+    #         value[lastKey = name] = (if _.isNumber(v) then parseFloat(v) else v)
 
-        this[lastKey] = {} if lastKey == 'sorting' # clear previously sorting
-        this[lastKey] = angular.extend(this[lastKey] or {}, value[lastKey])
-      else
-        this[key] = (if isNumber(data[key]) then parseFloat(data[key]) else data[key])
+    #     this[lastKey] = {} if lastKey == 'sorting' # clear previously sorting
+    #     this[lastKey] = angular.extend(this[lastKey] or {}, value[lastKey])
+    #   else
+    #     this[key] = (if _.isNumber(data[key]) then parseFloat(data[key]) else data[key])
 
     @orderBy = ->
       sorting = []
@@ -42,17 +42,18 @@ angular.module("ngTable").factory "ngTableParams", ->
           name = encodeURIComponent(key)
           if typeof item is "object"
             for subkey of item
-              if not angular.isUndefined(item[subkey]) and item[subkey] isnt ""
+              if not _.isUndefined(item[subkey]) and item[subkey] isnt ""
                 pname = name + "[" + encodeURIComponent(subkey) + "]"
                 if asString
                   pairs.push pname + "=" + encodeURIComponent(item[subkey])
                 else
                   pairs[pname] = encodeURIComponent(item[subkey])
-          else if not angular.isFunction(item) and not angular.isUndefined(item) and item isnt ""
+          else if not _.isFunction(item) and not _.isUndefined(item) and item isnt ""
             if asString
               pairs.push name + "=" + encodeURIComponent(item)
             else
               pairs[name] = encodeURIComponent(item)
       return pairs
     return this
-  return ngTableParams
+  return ngTableOptions
+)
