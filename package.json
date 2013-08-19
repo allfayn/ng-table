@@ -14,6 +14,6 @@
     "grunt-contrib-less": "~0.5.2",
     "grunt-contrib-cssmin": "~0.6.1"
   },
-  "name": "ng-table",
-  "version": "0.2.1"
+  "name": "infowrap-ng-table",
+  "version": "0.1.1"
 }
