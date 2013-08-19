@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "main": ["ng-table.js", "ng-table.css"],
   "ignore": [
-    "examples", "src"
+    "**/.*",
+    ".temp",
+    "examples",
+    "src",
+    "Gruntfile.coffee"
   ],
   "dependencies": {
     "angular": "~1.0.6"
