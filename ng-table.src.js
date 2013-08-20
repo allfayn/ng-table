@@ -89,7 +89,7 @@ angular.module("ngTable", []).directive("ngTable", [
           return columns.push({
             id: i++,
             title: parsedTitle,
-            sortable: (el.attr("sortable") ? el.attr("sortable") : false),
+            sortable: (el.attr("data-sortable") ? el.attr("data-sortable") : false),
             filter: filter,
             filterTemplateURL: filterTemplateURL,
             headerTemplateURL: headerTemplateURL,
@@ -152,14 +152,12 @@ angular.module("ngTable", []).directive("ngTable", [
             }
             return pages;
           };
-          if (scope.options.paginationEnabled) {
-            scope.$watch('options', function(options) {
-              if (_.isUndefined(options)) {
-                return;
-              }
-              return scope.pages = generatePages(options.page, options.total, options.count);
-            }, true);
-          }
+          scope.$watch('options', function(options) {
+            if (_.isUndefined(options)) {
+              return;
+            }
+            return scope.pages = generatePages(options.page, options.total, options.count);
+          }, true);
           scope.parse = function(text) {
             return text(scope);
           };
@@ -191,7 +189,8 @@ angular.module("ngTable", []).directive("ngTable", [
               header: (attrs.templateHeader ? attrs.templateHeader : "ng-table/header.html"),
               pagination: (attrs.templatePagination ? attrs.templatePagination : "ng-table/pager.html")
             };
-            headerTemplate = $compile("<thead ng-include=\"templates.header\"></thead>")(scope);
+            headerTemplate = '<thead>\n<tr><th ng-class="{sortable: column.sortable,\'sort-asc\': options.sorting[column.sortable]==\'asc\', \'sort-desc\': options.sorting[column.sortable]==\'desc\'}" ng-click="sortBy(column)" ng-repeat="column in columns" ng-show="column.show(this)" class="header"><div ng-hide="column.headerTemplateURL" ng-bind="parse(column.title)"></div><div ng-show="column.headerTemplateURL" ng-include="column.headerTemplateURL"></div></th></tr><tr ng-show="showFilter" class="ng-table-filters"><th ng-repeat="column in columns" ng-show="column.show(this)" data-title-text="{{column.title}}" class="filter"><form ng-submit="doFilter()"><input type="submit" tabindex="-1" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/><div ng-repeat="(name, filter) in column.filter"><div ng-if="column.filterTemplateURL"><div ng-include="column.filterTemplateURL"></div></div><div ng-if="!column.filterTemplateURL"><div ng-include="\'ng-table/filters/\' + filter + \'.html\'"></div></div></div></form></th></tr>\n</thead>';
+            headerTemplate = $compile(headerTemplate)(scope);
             element.filter("thead").remove();
             tbody = element.find('tbody');
             if (tbody[0]) {
@@ -201,7 +200,8 @@ angular.module("ngTable", []).directive("ngTable", [
             }
             element.addClass("ng-table");
             if (scope.options.paginationEnabled) {
-              paginationTemplate = $compile("<div ng-include=\"templates.pagination\"></div>")(scope);
+              paginationTemplate = '<div class="pagination ng-cloak"><ul class="pagination"><li ng-class="{\'disabled\': !page.active}" ng-repeat="page in pages" ng-switch="page.type"><a ng-switch-when="prev" ng-click="goToPage(page.number)" href="">«</a><a ng-switch-when="first" ng-click="goToPage(page.number)" href="">{{page.number}}</a><a ng-switch-when="page" ng-click="goToPage(page.number)" href="">{{page.number}}</a><a ng-switch-when="more" ng-click="goToPage(page.number)" href="">…</a><a ng-switch-when="last" ng-click="goToPage(page.number)" href="">{{page.number}}</a><a ng-switch-when="next" ng-click="goToPage(page.number)" href="">»</a></li></ul><div ng-show="params.counts.length" class="btn-group pull-right"><button ng-repeat="count in params.counts" type="button" ng-class="{\'active\':params.count==count}" ng-click="changeCount(count)" class="btn btn-mini">{{count}}</button></div></div>';
+              paginationTemplate = $compile(paginationTemplate)(scope);
               return element.after(paginationTemplate);
             }
           }
@@ -244,7 +244,7 @@ angular.module("ngTable").factory("ngTableOptions", function() {
       asString = asString || false;
       pairs = (asString ? [] : {});
       for (key in this) {
-        if (this.hasOwnProperty(key)) {
+        if (_.has(this, key)) {
           if (ignoreFields.indexOf(key) >= 0) {
             continue;
           }
@@ -280,10 +280,3 @@ angular.module("ngTable").factory("ngTableOptions", function() {
 /*
 //@ sourceMappingURL=options.js.map
 */
-angular.module('ngTable').run(['$templateCache', function ($templateCache) {
-	$templateCache.put('ng-table/filters/button.html', '<button ng-click="doFilter()" ng-show="filter==\'button\'" class="btn btn-primary btn-block">Filter</button>');
-	$templateCache.put('ng-table/filters/select.html', '<select ng-options="data.id as data.title for data in column.data" ng-model="options.filter[name]" ng-show="filter==\'select\'" class="filter filter-select"></select>');
-	$templateCache.put('ng-table/filters/text.html', '<input type="text" ng-model="options.filter[name]" ng-show="filter==\'text\'" class="input-filter"/>');
-	$templateCache.put('ng-table/header.html', '<tr><th ng-class="{sortable: column.sortable,\'sort-asc\': options.sorting[column.sortable]==\'asc\', \'sort-desc\': options.sorting[column.sortable]==\'desc\'}" ng-click="sortBy(column)" ng-repeat="column in columns" ng-show="column.show(this)" class="header"><div ng-hide="column.headerTemplateURL" ng-bind="parse(column.title)"></div><div ng-show="column.headerTemplateURL" ng-include="column.headerTemplateURL"></div></th></tr><tr ng-show="showFilter" class="ng-table-filters"><th ng-repeat="column in columns" ng-show="column.show(this)" data-title-text="{{column.title}}" class="filter"><form ng-submit="doFilter()"><input type="submit" tabindex="-1" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/><div ng-repeat="(name, filter) in column.filter"><div ng-if="column.filterTemplateURL"><div ng-include="column.filterTemplateURL"></div></div><div ng-if="!column.filterTemplateURL"><div ng-include="\'ng-table/filters/\' + filter + \'.html\'"></div></div></div></form></th></tr>');
-	$templateCache.put('ng-table/pager.html', '<div class="pagination ng-cloak"><ul class="pagination"><li ng-class="{\'disabled\': !page.active}" ng-repeat="page in pages" ng-switch="page.type"><a ng-switch-when="prev" ng-click="goToPage(page.number)" href="">«</a><a ng-switch-when="first" ng-click="goToPage(page.number)" href="">{{page.number}}</a><a ng-switch-when="page" ng-click="goToPage(page.number)" href="">{{page.number}}</a><a ng-switch-when="more" ng-click="goToPage(page.number)" href="">…</a><a ng-switch-when="last" ng-click="goToPage(page.number)" href="">{{page.number}}</a><a ng-switch-when="next" ng-click="goToPage(page.number)" href="">»</a></li></ul><div ng-show="params.counts.length" class="btn-group pull-right"><button ng-repeat="count in params.counts" type="button" ng-class="{\'active\':params.count==count}" ng-click="changeCount(count)" class="btn btn-mini">{{count}}</button></div></div>');
-}]);

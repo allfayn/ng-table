@@ -10,8 +10,9 @@
 
         <link rel="stylesheet" href="css/bootstrap.css">
         <script src="js/jquery-1.9.1.min.js"></script>
+        <script src="js/lodash.min.js"></script>
         <script src="js/angular.min.js"></script>
-        <script src="../ng-table.js"></script>
+        <script src="../ng-table.src.js"></script>
         <link rel="stylesheet" href="../ng-table.css">
     </head>
 <body ng-app="main">
@@ -24,7 +25,7 @@
 
 
         <table ng-table="tableParams" template-pagination="custom/pager" class="table">
-            <tr ng-repeat="user in users">
+            <tr ng-repeat="user in $parent.users">
                 <td data-title="'Name of people'">
                     {{user.name}}
                 </td>
@@ -41,7 +42,7 @@
                 <a ng-switch-when="prev" ng-click="goToPage(page.number)" href="">&laquo; Previous</a>
                 <a ng-switch-when="next" ng-click="goToPage(page.number)" href="">Next &raquo;</a>
               </li>
-                <li> 
+                <li>
                 <div class="btn-group">
                     <button type="button" ng-class="{'active':params.count == 10}" ng-click="changeCount(10)" class="btn">10</button>
                     <button type="button" ng-class="{'active':params.count == 25}" ng-click="changeCount(25)" class="btn">25</button>
@@ -54,7 +55,7 @@
 
         <script>
         var app = angular.module('main', ['ngTable']).
-        controller('DemoCtrl', function($scope, ngTableParams) {
+        controller('DemoCtrl', function($scope, ngTableOptions) {
 
             var data = [{name: "Moroni", age: 50},
                         {name: "Tiancum", age: 43},
@@ -74,12 +75,12 @@
                         {name: "Nephi", age: 29},
                         {name: "Enos", age: 34}];
 
-            $scope.tableParams = new ngTableParams({
+            $scope.tableParams = new ngTableOptions({
                 page: 1,            // show first page
                 total: data.length, // length of data
                 count: 10           // count per page
             });
-            
+
             $scope.$watch('tableParams', function(params) {
 
                 $scope.users = data.slice((params.page - 1) * params.count, params.page * params.count);
