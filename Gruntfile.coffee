@@ -109,7 +109,7 @@ module.exports = (grunt) ->
         'clean'
         'coffee'
         'jade'
-        'ngTemplateCache'
+        # 'ngTemplateCache'
         'concat'
         'less'
         'copy'

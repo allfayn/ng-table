@@ -36,7 +36,7 @@ angular.module("ngTable").factory("ngTableOptions", ->
       asString = asString or false
       pairs = (if asString then [] else {})
       for key of this
-        if @hasOwnProperty(key)
+        if _.has(this, key)
           continue  if ignoreFields.indexOf(key) >= 0
           item = this[key]
           name = encodeURIComponent(key)

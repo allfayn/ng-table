@@ -63,7 +63,7 @@
             return !isNaN(parseFloat(n)) && isFinite(n);
         }
         var app = angular.module('main', ['ngTable', 'ngResource', 'ngMockE2E']).
-            run(function($httpBackend, $filter, $log, ngTableParams) {
+            run(function($httpBackend, $filter, $log, ngTableOptions) {
                 // emulation of api server
                 $httpBackend.whenGET(/data.*/).respond(function(method, url, data, headers) {
                     var query = url.split('?')[1],
@@ -112,7 +112,7 @@
                             {name: "Nephi", age: 29},
                             {name: "Enos", age: 34}];
 
-                    var params = new ngTableParams(requestParams);
+                    var params = new ngTableOptions(requestParams);
                     data = params.filter ? $filter('filter')(data, params.filter) : data;
                     data = params.sorting ? $filter('orderBy')(data, params.orderBy()) : data;
 
@@ -139,10 +139,10 @@
                     }
                 };
             })
-        .controller('DemoCtrl', function($scope, $timeout, $resource, ngTableParams) {
+        .controller('DemoCtrl', function($scope, $timeout, $resource, ngTableOptions) {
             var Api = $resource('/data');
 
-            $scope.tableParams = new ngTableParams({
+            $scope.tableParams = new ngTableOptions({
                 page: 1,            // show first page
                 total: 0,           // length of data
                 count: 10,          // count per page
