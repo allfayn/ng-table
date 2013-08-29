@@ -26,10 +26,10 @@
 
         <table ng-table="tableParams" class="table ng-table-responsive">
             <tr ng-repeat="user in $parent.users">
-                <td data-title="'Name'">
+                <td data-title="Name" data-column="Name">
                     {{user.name}}
                 </td>
-                <td data-title="'Age'">
+                <td data-title="Age" data-column="Age">
                     {{user.age}}
                 </td>
             </tr>
