@@ -8,7 +8,7 @@ angular.module("ngTable").factory("ngTableOptions", ->
     @sorting = {}
     @paginationEnabled = true
 
-    _.extend(this, data)
+    angular.extend(this, data)
     # # parse url params
     # for key, value of data
     #   if key.indexOf("[") >= 0
@@ -18,12 +18,12 @@ angular.module("ngTable").factory("ngTableOptions", ->
     #       unless name is ""
     #         v = value
     #         value = {}
-    #         value[lastKey = name] = (if _.isNumber(v) then parseFloat(v) else v)
+    #         value[lastKey = name] = (if angular.isNumber(v) then parseFloat(v) else v)
 
     #     this[lastKey] = {} if lastKey == 'sorting' # clear previously sorting
     #     this[lastKey] = angular.extend(this[lastKey] or {}, value[lastKey])
     #   else
-    #     this[key] = (if _.isNumber(data[key]) then parseFloat(data[key]) else data[key])
+    #     this[key] = (if angular.isNumber(data[key]) then parseFloat(data[key]) else data[key])
 
     @orderBy = ->
       sorting = []
@@ -36,19 +36,19 @@ angular.module("ngTable").factory("ngTableOptions", ->
       asString = asString or false
       pairs = (if asString then [] else {})
       for key of this
-        if _.has(this, key)
+        if angular.has(this, key)
           continue  if ignoreFields.indexOf(key) >= 0
           item = this[key]
           name = encodeURIComponent(key)
           if typeof item is "object"
             for subkey of item
-              if not _.isUndefined(item[subkey]) and item[subkey] isnt ""
+              if not angular.isUndefined(item[subkey]) and item[subkey] isnt ""
                 pname = name + "[" + encodeURIComponent(subkey) + "]"
                 if asString
                   pairs.push pname + "=" + encodeURIComponent(item[subkey])
                 else
                   pairs[pname] = encodeURIComponent(item[subkey])
-          else if not _.isFunction(item) and not _.isUndefined(item) and item isnt ""
+          else if not angular.isFunction(item) and not angular.isUndefined(item) and item isnt ""
             if asString
               pairs.push name + "=" + encodeURIComponent(item)
             else

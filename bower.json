@@ -1,6 +1,6 @@
 {
-  "name": "infowrap-ng-table",
-  "version": "0.1.3",
+  "name": "allfayn-ng-table",
+  "version": "0.1.4",
   "main": ["ng-table.js", "ng-table.css"],
   "ignore": [
     "**/.*",
@@ -10,6 +10,6 @@
     "Gruntfile.coffee"
   ],
   "dependencies": {
-    "angular": "~1.0.6"
+    "angular": "~1.2.0-rc.1"
   }
 }

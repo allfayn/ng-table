@@ -86,6 +86,10 @@ module.exports = (grunt) ->
                 options:
                     trim: './.temp/'
                     module: 'ngTable'
+        watch:
+            src:
+                files: ["src/scripts/*.coffee", '**/*.jade']
+                tasks: ['dev']
 
     # Register grunt tasks supplied by grunt-contrib-*.
     # Referenced in package.json.
@@ -98,7 +102,7 @@ module.exports = (grunt) ->
     grunt.loadNpmTasks 'grunt-contrib-cssmin'
     grunt.loadNpmTasks 'grunt-contrib-uglify'
     grunt.loadNpmTasks 'grunt-contrib-concat'
-
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     # Register grunt tasks supplied by grunt-hustler.
     # Referenced in package.json.
@@ -109,7 +113,7 @@ module.exports = (grunt) ->
         'clean'
         'coffee'
         'jade'
-        # 'ngTemplateCache'
+        'ngTemplateCache'
         'concat'
         'less'
         'copy'
