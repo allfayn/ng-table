@@ -1,4 +1,4 @@
-div.pagination.ng-cloak
+div.ng-cloak
   ul.pagination
     li(ng-class="{'disabled': !page.active}", ng-repeat='page in pages', ng-switch='page.type')
       a(ng-switch-when='prev', ng-click='goToPage(page.number)', href='') «
@@ -7,5 +7,5 @@ div.pagination.ng-cloak
       a(ng-switch-when='more', ng-click='goToPage(page.number)', href='') …
       a(ng-switch-when='last', ng-click='goToPage(page.number)', href='') {{page.number}}
       a(ng-switch-when='next', ng-click='goToPage(page.number)', href='') »
-  .btn-group.pull-right(ng-show="params.counts.length")
-    button.btn.btn-mini(ng-repeat="count in params.counts", type='button', ng-class="{'active':params.count == count}", ng-click='changeCount(count)') {{count}}
+  .btn-group.pull-right(ng-show="options.counts.length")
+    button.btn.btn-mini(ng-repeat="count in options.counts", type='button', ng-class="{'active':options.count == count}", ng-click='changeCount(count)') {{count}}

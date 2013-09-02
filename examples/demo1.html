@@ -56,7 +56,8 @@
             $scope.tableParams = new ngTableOptions({
                 page: 1,            // show first page
                 total: data.length, // length of data
-                count: 3           // count per page
+                count: 3,
+                counts: [10,20,50] // count per page
             });
 
             $scope.$watch('tableParams', function(params) {
