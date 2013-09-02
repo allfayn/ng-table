@@ -10,7 +10,7 @@ ngTable: Table + Angular JS
 @license New BSD License <http://creativecommons.org/licenses/BSD/>
 ###
 
-angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", "$http", "ngTableOptions", "$templateCache", ($compile, $q, $parse, $http, ngTableOptions, $templateCache) ->
+angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", "$http", "ngTableOptions", "$templateCache","$rootElement","$timeout", ($compile, $q, $parse, $http, ngTableOptions, $templateCache, $rootElement, $timeout) ->
   restrict: "A"
   priority: 1001
   scope:
@@ -38,7 +38,6 @@ angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", 
       updateOptions
         page: 1
         count: count
-
 
     s.doFilter = ->
       updateOptions page: 1
@@ -78,6 +77,7 @@ angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", 
         filterData: (if el.attr("filter-data") then el.attr("filter-data") else null)
         show: (if el.attr("ng-show") then (scope) -> $parse(el.attr("ng-show"))(scope) else () -> true)
 
+#    console.log "columns:", columns
 
     (scope, element, attrs) ->
       scope.columns = columns
@@ -130,9 +130,7 @@ angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", 
         scope.pages = generatePages(options.page, options.total, options.count)
       , true
 
-      scope.parse = (text) ->
-        return text(scope)
-
+      scope.parse = (text) -> text(scope) if text
       # get data from columns
       angular.forEach columns, (column) ->
         return  unless column.filterData
@@ -147,15 +145,11 @@ angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", 
 
       # create table
       unless element.hasClass("ng-table")
-        scope.templates =
-          header: (if attrs.templateHeader then attrs.templateHeader else "ng-table/header.html")
-          pagination: (if attrs.templatePagination then attrs.templatePagination else "ng-table/pager.html")
+        scope.tplHeader = if attrs.templateHeader then attrs.templateHeader else "ng-table/header.html"
+        scope.tplPager = if attrs.templatePagination then attrs.templatePagination else "ng-table/pager.html"
 
-        # workaround for angular 1.2 issue with ng-include
-        theadTemplate = "<table><thead>" + ($templateCache.get(scope.templates.header)) + "</thead></table>";
-        console.log "theadTemplate:", theadTemplate
-        headerTemplate = $compile("<table><thead>#{$templateCache.get(scope.templates.header)}</thead></table>")(scope)
-        paginationTemplate = $compile("<div>#{$templateCache.get(scope.templates.pagination)}</div>")(scope)
+        headerTemplate = $compile('<table><thead ng-include="tplHeader"></thead></table>')(scope)
+        paginationTemplate = $compile('<div><ng-include src="tplPager"></ng-include></div>')(scope)
         element.find("thead").remove()
         tbody = element.find('tbody')
         element.prepend headerTemplate.find('thead')

@@ -10,7 +10,7 @@ ngTable: Table + Angular JS
 */
 
 angular.module("ngTable", []).directive("ngTable", [
-  "$compile", "$q", "$parse", "$http", "ngTableOptions", "$templateCache", function($compile, $q, $parse, $http, ngTableOptions, $templateCache) {
+  "$compile", "$q", "$parse", "$http", "ngTableOptions", "$templateCache", "$rootElement", "$timeout", function($compile, $q, $parse, $http, ngTableOptions, $templateCache, $rootElement, $timeout) {
     return {
       restrict: "A",
       priority: 1001,
@@ -102,7 +102,7 @@ angular.module("ngTable", []).directive("ngTable", [
           });
         });
         return function(scope, element, attrs) {
-          var generatePages, headerTemplate, paginationTemplate, tbody, theadTemplate;
+          var generatePages, headerTemplate, paginationTemplate, tbody;
           scope.columns = columns;
           generatePages = function(currentPage, totalItems, pageSize) {
             var maxBlocks, maxPage, maxPivotPages, minPage, numPages, pages;
@@ -159,7 +159,9 @@ angular.module("ngTable", []).directive("ngTable", [
             return scope.pages = generatePages(options.page, options.total, options.count);
           }, true);
           scope.parse = function(text) {
-            return text(scope);
+            if (text) {
+              return text(scope);
+            }
           };
           angular.forEach(columns, function(column) {
             var promise;
@@ -185,14 +187,10 @@ angular.module("ngTable", []).directive("ngTable", [
             });
           });
           if (!element.hasClass("ng-table")) {
-            scope.templates = {
-              header: (attrs.templateHeader ? attrs.templateHeader : "ng-table/header.html"),
-              pagination: (attrs.templatePagination ? attrs.templatePagination : "ng-table/pager.html")
-            };
-            theadTemplate = "<table><thead>" + ($templateCache.get(scope.templates.header)) + "</thead></table>";
-            console.log("theadTemplate:", theadTemplate);
-            headerTemplate = $compile("<table><thead>" + ($templateCache.get(scope.templates.header)) + "</thead></table>")(scope);
-            paginationTemplate = $compile("<div>" + ($templateCache.get(scope.templates.pagination)) + "</div>")(scope);
+            scope.tplHeader = attrs.templateHeader ? attrs.templateHeader : "ng-table/header.html";
+            scope.tplPager = attrs.templatePagination ? attrs.templatePagination : "ng-table/pager.html";
+            headerTemplate = $compile('<table><thead ng-include="tplHeader"></thead></table>')(scope);
+            paginationTemplate = $compile('<div><ng-include src="tplPager"></ng-include></div>')(scope);
             element.find("thead").remove();
             tbody = element.find('tbody');
             element.prepend(headerTemplate.find('thead'));
