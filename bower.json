@@ -1,7 +1,10 @@
 {
   "name": "allfayn-ng-table",
   "version": "0.1.4",
-  "main": ["ng-table.js", "ng-table.css"],
+  "main": [
+    "ng-table.js",
+    "ng-table.css"
+  ],
   "ignore": [
     "**/.*",
     ".temp",
@@ -9,7 +12,7 @@
     "src",
     "Gruntfile.coffee"
   ],
-  "dependencies": {
-    "angular": "~1.2.0-rc.1"
+  "devDependencies": {
+    "angular": "https://github.com/angular/angular.js.git#master"
   }
 }

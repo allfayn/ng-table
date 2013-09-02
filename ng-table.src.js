@@ -102,7 +102,7 @@ angular.module("ngTable", []).directive("ngTable", [
           });
         });
         return function(scope, element, attrs) {
-          var generatePages, headerTemplate, paginationTemplate, tbody;
+          var generatePages, paginationTemplate;
           scope.columns = columns;
           generatePages = function(currentPage, totalItems, pageSize) {
             var maxBlocks, maxPage, maxPivotPages, minPage, numPages, pages;
@@ -189,12 +189,10 @@ angular.module("ngTable", []).directive("ngTable", [
           if (!element.hasClass("ng-table")) {
             scope.tplHeader = attrs.templateHeader ? attrs.templateHeader : "ng-table/header.html";
             scope.tplPager = attrs.templatePagination ? attrs.templatePagination : "ng-table/pager.html";
-            headerTemplate = $compile('<table><thead ng-include="tplHeader"></thead></table>')(scope);
             paginationTemplate = $compile('<div><ng-include src="tplPager"></ng-include></div>')(scope);
             element.find("thead").remove();
-            tbody = element.find('tbody');
-            element.prepend(headerTemplate.find('thead'));
-            headerTemplate = $compile(element.find("thead").contents())(scope);
+            element[0].createTHead().setAttribute('ng-include', 'tplHeader');
+            $compile(element.find("thead"))(scope);
             element.addClass("ng-table");
             if (scope.options.paginationEnabled) {
               return element.after(paginationTemplate);

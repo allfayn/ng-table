@@ -77,7 +77,6 @@ angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", 
         filterData: (if el.attr("filter-data") then el.attr("filter-data") else null)
         show: (if el.attr("ng-show") then (scope) -> $parse(el.attr("ng-show"))(scope) else () -> true)
 
-#    console.log "columns:", columns
 
     (scope, element, attrs) ->
       scope.columns = columns
@@ -148,14 +147,11 @@ angular.module("ngTable", []).directive("ngTable", ["$compile", "$q", "$parse", 
         scope.tplHeader = if attrs.templateHeader then attrs.templateHeader else "ng-table/header.html"
         scope.tplPager = if attrs.templatePagination then attrs.templatePagination else "ng-table/pager.html"
 
-        headerTemplate = $compile('<table><thead ng-include="tplHeader"></thead></table>')(scope)
         paginationTemplate = $compile('<div><ng-include src="tplPager"></ng-include></div>')(scope)
         element.find("thead").remove()
-        tbody = element.find('tbody')
-        element.prepend headerTemplate.find('thead')
-        headerTemplate = $compile(element.find("thead").contents())(scope)
+        element[0].createTHead().setAttribute 'ng-include', 'tplHeader'
+        $compile(element.find("thead"))(scope)
         element.addClass "ng-table"
-
         if scope.options.paginationEnabled
           element.after paginationTemplate
 ])
